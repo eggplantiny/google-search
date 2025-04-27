@@ -11,7 +11,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "start": "esno ./src/index.ts"
+    "start": "esno ./src/playground.ts"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
