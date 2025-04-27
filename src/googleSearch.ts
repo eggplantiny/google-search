@@ -7,7 +7,7 @@ import { parseHtml } from './parser'
 import { getRandomUserAgent } from './userAgentProvider'
 import { formatUrl, sleep } from './utils'
 
-const defaultOptions: Required<Omit<SearchOptions, 'stop' | 'extraParams' | 'userAgent' | 'cookieJar'>> & Pick<SearchOptions, 'stop' | 'extraParams' | 'userAgent' | 'cookieJar'> = {
+const defaultOptions: Required<Omit<SearchOptions, 'stop' | 'extraParams' | 'userAgent' | 'cookieJar' | 'verifySsl'>> & Pick<SearchOptions, 'stop' | 'extraParams' | 'userAgent' | 'cookieJar'> = {
   tld: 'com',
   lang: 'en',
   tbs: '0',
@@ -19,7 +19,6 @@ const defaultOptions: Required<Omit<SearchOptions, 'stop' | 'extraParams' | 'use
   country: '',
   extraParams: {},
   userAgent: null, // Indicates random should be used
-  verifySsl: true,
   includeGoogleLinks: false,
   cookieJar: new CookieJar(), // Default in-memory jar per search instance
 }
@@ -31,7 +30,7 @@ export async function* search(
   const settings: Required<Omit<SearchOptions, 'stop' | 'extraParams' | 'userAgent' | 'cookieJar'>> & Pick<SearchOptions, 'stop' | 'extraParams' | 'userAgent' | 'cookieJar'> = {
     ...defaultOptions,
     ...options,
-    cookieJar: options?.cookieJar ?? new CookieJar(), // Use provided or create new
+    cookieJar: options?.cookieJar ?? new CookieJar(),
     extraParams: { ...(options?.extraParams || {}) }, // Deep copy extraParams
   }
 
@@ -42,7 +41,7 @@ export async function* search(
     }
   }
 
-  const httpClient = new HttpClient(settings.cookieJar, settings.verifySsl)
+  const httpClient = new HttpClient(settings.cookieJar!)
   const hashes = new Set<string>() // Use string hashes or the URLs themselves
   let count = 0
   let currentStart = settings.start
@@ -57,7 +56,7 @@ export async function* search(
   //   console.warn('Failed to fetch Google home page for initial cookies:', error);
   // }
 
-  while (settings.stop === null || count < settings.stop) {
+  while (settings.stop === null || count < settings.stop!) {
     const lastCount = count
 
     // Determine user agent for this request
@@ -144,7 +143,7 @@ export async function* search(
         hashes.add(h)
         yield link
         count++
-        if (settings.stop !== null && count >= settings.stop) {
+        if (settings.stop !== null && count >= settings.stop!) {
           console.log(`Reached stop limit: ${settings.stop}`)
           return // Stop the generator
         }
