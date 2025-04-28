@@ -1,9 +1,9 @@
 {
-  "name": "google-search",
+  "name": "google-search-mcp-server",
   "version": "1.0.0",
   "description": "",
   "author": "eggplantiny",
-  "license": "ISC",
+  "license": "MIT",
   "keywords": [
     "google",
     "search",
@@ -11,9 +11,11 @@
   ],
   "main": "index.js",
   "scripts": {
-    "start": "esno ./src/playground.ts"
+    "start": "esno ./src/index.ts",
+    "build": "tsc --outDir dist"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.2",
     "@wrtnlabs/web-content-extractor": "^3.2.4",
     "cheerio": "^1.0.0",
     "iconv-lite": "^0.6.3",
