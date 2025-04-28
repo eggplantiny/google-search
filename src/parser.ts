@@ -43,7 +43,7 @@ export function filterResult(linkUrl: string | undefined | null, includeGoogleLi
 
     return actualLink
   }
-  catch (error) {
+  catch {
     // Ignore errors during parsing/filtering individual links (e.g., invalid URL format)
     // console.warn(`Failed to filter link: ${linkUrl}`, error);
     return null

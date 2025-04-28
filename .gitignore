@@ -40,3 +40,5 @@ coverage
 .genkit
 data
 /packages/core/.genkit/
+
+data

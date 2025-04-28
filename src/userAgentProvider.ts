@@ -1,16 +1,64 @@
+import { Buffer } from 'node:buffer'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import * as zlib from 'node:zlib'
 import { config } from './config'
 
 let userAgents: string[] = [config.defaultUserAgent]
 let loaded = false
 
-function loadUserAgentsFromFile(): void {
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+const installFolder = resolve(__dirname, '..', 'data')
+
+const downloadUrl = 'https://github.com/MarioVilas/googlesearch/raw/refs/heads/master/googlesearch/user_agents.txt.gz'
+
+function assureInstallFolderExists(): void {
+  if (!fs.existsSync(installFolder)) {
+    fs.mkdirSync(installFolder, { recursive: true })
+    console.log(`Created install folder: ${installFolder}`)
+  }
+}
+
+function checkUserAgentFile(): boolean {
+  const gzPath = path.join(installFolder, 'user_agents.txt.gz')
+  const txtPath = path.join(installFolder, 'user_agents.txt')
+
+  return fs.existsSync(gzPath) || fs.existsSync(txtPath)
+}
+
+async function downloadUserAgents(): Promise<void> {
+  const gzPath = path.join(installFolder, 'user_agents.txt.gz')
+
+  assureInstallFolderExists()
+
+  try {
+    const response = await fetch(downloadUrl)
+    if (!response.ok) {
+      throw new Error(`Failed to download user agents: ${response.statusText}`)
+    }
+
+    const buffer = await response.arrayBuffer()
+    fs.writeFileSync(gzPath, Buffer.from(buffer))
+    console.log('User agents downloaded successfully.')
+  }
+  catch (error) {
+    console.error('Error downloading user agents:', error)
+  }
+}
+
+async function loadUserAgentsFromFile(): Promise<void> {
   if (loaded)
     return
 
-  const installFolder = path.dirname(__filename) // or determine install folder appropriately
+  if (!checkUserAgentFile()) {
+    console.warn('User agent file not found. Downloading...')
+    await downloadUserAgents()
+  }
+
   const gzPath = path.join(installFolder, 'user_agents.txt.gz')
   const txtPath = path.join(installFolder, 'user_agents.txt')
 
@@ -44,10 +92,11 @@ function loadUserAgentsFromFile(): void {
   }
 }
 
-export function getRandomUserAgent(): string {
+export async function getRandomUserAgent(): Promise<string> {
   if (!loaded) {
-    loadUserAgentsFromFile()
+    await loadUserAgentsFromFile()
   }
+
   if (userAgents.length === 0) {
     return config.defaultUserAgent // Should not happen if loadUserAgentsFromFile works correctly
   }

@@ -1,6 +1,6 @@
 import type { SearchOptions } from './types'
 import { URLSearchParams } from 'node:url'
-import { Cookie, CookieJar } from 'tough-cookie'
+import { CookieJar } from 'tough-cookie'
 import { config } from './config'
 import { HttpClient } from './httpClient'
 import { parseHtml } from './parser'
@@ -47,20 +47,21 @@ export async function* search(
   let currentStart = settings.start
 
   // Initial fetch to potentially get cookies (optional, depends on Google's behavior)
-  // try {
-  //   const initialUserAgent = settings.userAgent ?? getRandomUserAgent();
-  //   const homeUrl = formatUrl(config.urls.home, { tld: settings.tld });
-  //   await httpClient.getPage(homeUrl, initialUserAgent);
-  //   console.log("Initial homepage fetch successful (for cookies).");
-  // } catch (error) {
-  //   console.warn('Failed to fetch Google home page for initial cookies:', error);
-  // }
+  try {
+    const initialUserAgent = settings.userAgent ?? await getRandomUserAgent()
+    const homeUrl = formatUrl(config.urls.home, { tld: settings.tld })
+    await httpClient.getPage(homeUrl, initialUserAgent)
+    console.log('Initial homepage fetch successful (for cookies).')
+  }
+  catch (error) {
+    console.warn('Failed to fetch Google home page for initial cookies:', error)
+  }
 
   while (settings.stop === null || count < settings.stop!) {
     const lastCount = count
 
     // Determine user agent for this request
-    const userAgent = settings.userAgent ?? getRandomUserAgent()
+    const userAgent = settings.userAgent ?? await getRandomUserAgent()
 
     // Build URL
     let urlTemplate: string
