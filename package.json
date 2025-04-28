@@ -14,6 +14,7 @@
     "start": "esno ./src/playground.ts"
   },
   "dependencies": {
+    "@wrtnlabs/web-content-extractor": "^3.2.4",
     "cheerio": "^1.0.0",
     "iconv-lite": "^0.6.3",
     "tough-cookie": "^5.1.2"

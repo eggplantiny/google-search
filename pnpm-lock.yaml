@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@wrtnlabs/web-content-extractor':
+        specifier: ^3.2.4
+        version: 3.2.4
       cheerio:
         specifier: ^1.0.0
         version: 1.0.0
@@ -592,6 +595,10 @@ packages:
 
   '@vue/shared@3.5.13':
     resolution: {integrity: sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==}
+
+  '@wrtnlabs/web-content-extractor@3.2.4':
+    resolution: {integrity: sha512-m1qbz9SopZOh/JgVrd3fK/jrBSbcczoBMdg0pUCcy465VuHSRK+hDN2S0ulU/6cxDIhj3LvRDlblHk2ncvTgRQ==}
+    engines: {node: '>=18.0.0'}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -2266,6 +2273,12 @@ snapshots:
       '@vue/shared': 3.5.13
 
   '@vue/shared@3.5.13': {}
+
+  '@wrtnlabs/web-content-extractor@3.2.4':
+    dependencies:
+      cheerio: 1.0.0
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
 
   acorn-jsx@5.3.2(acorn@8.14.1):
     dependencies:
