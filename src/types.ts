@@ -1,5 +1,12 @@
 import type { CookieJar } from 'tough-cookie'
 
+export interface GoogleSearchArgs {
+  query: string
+  num?: number // Number of results to fetch (default: 10)
+  start?: number // Start index (default: 0)
+  stop?: number // Stop index (default: null)
+}
+
 export interface SearchOptions {
   tld?: string // Top level domain (default: 'com')
   lang?: string // Language (default: 'en')

@@ -142,7 +142,7 @@ export async function* search(
       if (!hashes.has(link)) {
         hashes.add(link)
         yield item
-        count++
+        count += 1
         if (settings.stop !== null && count >= settings.stop!) {
           console.log(`Reached stop limit: ${settings.stop}`)
           return
