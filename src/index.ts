@@ -1,2 +1,2 @@
 export { lucky, search } from './googleSearch'
-export type { SearchOptions } from './types'
+export type { SearchOptions, SearchResultItem } from './types'

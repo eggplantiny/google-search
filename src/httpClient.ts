@@ -1,6 +1,6 @@
 import type { CookieJar } from 'tough-cookie'
+import { Buffer } from 'node:buffer' // For Buffer.from
 import * as iconv from 'iconv-lite' // For decoding non-UTF8 responses
-import { Cookie } from 'tough-cookie'
 // Node fetch is globally available in Node 18+
 // import fetch, { Headers, RequestInit, Response } from 'node-fetch'; // Uncomment for Node < 18
 
@@ -64,7 +64,7 @@ export class HttpClient {
         try {
           errorBody = await response.text()
         }
-        catch (e) {
+        catch {
           // Ignore if body can't be read
         }
         throw new Error(`HTTP Error: ${response.status} ${response.statusText} for ${url}\nBody: ${errorBody.substring(0, 500)}`)
@@ -80,7 +80,7 @@ export class HttpClient {
 
       if (setCookieHeaders) {
         // console.log("Set-Cookie headers:", setCookieHeaders); // Debug
-        await Promise.all(setCookieHeaders.map((cookieString) => {
+        await Promise.all(setCookieHeaders.map((cookieString: string) => {
           try {
             // console.log(`Setting cookie: ${cookieString} for url: ${url}`); // Debug
             return this.cookieJar.setCookie(cookieString, response.url || url) // Use response.url if redirected

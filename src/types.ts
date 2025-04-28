@@ -16,4 +16,8 @@ export interface SearchOptions {
   cookieJar?: CookieJar // Optional external cookie jar
 }
 
-// 내부 상태 관리 등을 위한 추가 인터페이스 정의 가능
+export interface SearchResultItem {
+  link: string
+  title: string
+  content: string
+}

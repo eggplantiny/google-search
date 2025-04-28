@@ -1,6 +1,5 @@
 import type { SearchOptions } from './types'
 import { lucky, search } from './googleSearch'
-import { getTbs } from './utils'
 
 async function main() {
   try {
@@ -18,9 +17,12 @@ async function main() {
     }
 
     let resultCount = 0
-    for await (const url of search(searchQuery, options)) {
-      resultCount++
-      console.log(`${resultCount}. ${url}`)
+    for await (const result of search(searchQuery, options)) {
+      resultCount += 1
+      console.log(`${resultCount}. ${result.title} - ${result.link}`)
+      console.log(`   Content: ${result.content}`)
+      console.log()
+      console.log()
     }
     console.log(`Standard search finished. Found ${resultCount} results.`)
 

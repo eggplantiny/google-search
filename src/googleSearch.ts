@@ -1,4 +1,4 @@
-import type { SearchOptions } from './types'
+import type { SearchOptions, SearchResultItem } from './types'
 import { URLSearchParams } from 'node:url'
 import { CookieJar } from 'tough-cookie'
 import { config } from './config'
@@ -26,7 +26,7 @@ const defaultOptions: Required<Omit<SearchOptions, 'stop' | 'extraParams' | 'use
 export async function* search(
   query: string,
   options?: SearchOptions,
-): AsyncGenerator<string, void, undefined> {
+): AsyncGenerator<SearchResultItem, void, undefined> {
   const settings: Required<Omit<SearchOptions, 'stop' | 'extraParams' | 'userAgent' | 'cookieJar'>> & Pick<SearchOptions, 'stop' | 'extraParams' | 'userAgent' | 'cookieJar'> = {
     ...defaultOptions,
     ...options,
@@ -134,34 +134,33 @@ export async function* search(
       return // Stop the generator
     }
 
-    const links = parseHtml(html, settings.includeGoogleLinks)
-    // console.log(`Parsed ${links.length} links.`); // Debug logging
-
-    for (const link of links) {
-      // Simple hash (the URL itself is unique enough for this purpose)
-      const h = link
-      if (!hashes.has(h)) {
-        hashes.add(h)
-        yield link
+    // parseHtml returns SearchResultItem[]
+    const items: SearchResultItem[] = parseHtml(html)
+    // Deduplicate and yield items
+    for (const item of items) {
+      const link = item.link
+      if (!hashes.has(link)) {
+        hashes.add(link)
+        yield item
         count++
         if (settings.stop !== null && count >= settings.stop!) {
           console.log(`Reached stop limit: ${settings.stop}`)
-          return // Stop the generator
+          return
         }
       }
     }
 
     // Check if no new results were found
-    if (lastCount === count && links.length > 0) {
+    if (lastCount === count && items.length > 0) {
       console.log('No new unique results found on this page. Might be the end.')
       // Potential improvement: Check for a "next page" link explicitly
       // If no next page link, break even if count didn't change much.
     }
-    if (links.length === 0 && count > 0) {
+    if (items.length === 0 && count > 0) {
       console.log('No results links found on the page. Assuming end of results.')
       break // No links found at all, likely end of results.
     }
-    if (lastCount === count && currentStart > 0 && links.length === 0) {
+    if (lastCount === count && currentStart > 0 && items.length === 0) {
       console.log('No new results and no links found on subsequent page. Definite end.')
       break
     }
@@ -176,7 +175,7 @@ export async function* search(
 export async function lucky(
   query: string,
   options?: Omit<SearchOptions, 'stop'>, // 'stop' is irrelevant for lucky
-): Promise<string | null> {
+): Promise<SearchResultItem | null> {
   // Ensure we only ask for 1 result and stop immediately
   const searchOptions: SearchOptions = {
     ...options,
@@ -187,9 +186,7 @@ export async function lucky(
   const result = await generator.next()
 
   if (!result.done) {
-    return result.value // Return the first yielded value
+    return result.value // Return the first yielded SearchResultItem
   }
-  else {
-    return null // No results found
-  }
+  return null // No results found
 }
